@@ -27,6 +27,13 @@ function signJwt(username, password) {
  */
 function verifyJwt(token) {
     // Your code here
+    jwt.verify(token,jwtPassword,(err,decoded) => {
+        if(err){
+            return false;
+        }else{
+            return true;
+        }
+    })
 }
 
 /**
@@ -38,6 +45,30 @@ function verifyJwt(token) {
  */
 function decodeJwt(token) {
     // Your code here
+        // Split the JWT into its three parts
+        const parts = token.split('.');
+
+        // JWT should have exactly three parts
+        if (parts.length !== 3) {
+            return false;
+        }
+    
+        // Base64Url decode the payload
+        const base64Url = parts[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload;
+        try {
+            jsonPayload = atob(base64);
+        } catch (e) {
+            return false;
+        }
+    
+        // Parse the JSON payload
+        try {
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            return false;
+        }
 }
 
 
