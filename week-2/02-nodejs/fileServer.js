@@ -17,6 +17,35 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 
+app.get('/files', (req,res)=>{
+  const path = path.join(__dirname,'./files/');
+  fs.readdir(path,(err,files)=>{
+    if(err){
+      res.status(500).json({
+        msg:'u are cooked'
+      })
+    }else{
+      res.status(200).json(files);
+    }
+  })
+})
+
+app.get('/files/:filename',(req,res)=>{
+  const filename = req.params.filename;
+  const path = path.join(__dirname,`./files/${filename}`);
+  fs.readFile(path,'utf-8',(err,data)=>{
+    if(err){
+      res.status(404).json({
+        msg:'u r cooked lol'
+      })
+    }else{
+      res.status(200).json(data)
+    }
+  })
+})
+
+
+
 
 
 

@@ -41,9 +41,95 @@
  */
   const express = require('express');
   const bodyParser = require('body-parser');
-  
+  const fs = require('fs');
   const app = express();
   
   app.use(bodyParser.json());
   
+  app.get('/todos',(req,res)=>{
+    fs.readFile('todos.json','utf-8',(err,data)=>{
+      if(err){
+        res.status(403).json({
+          msg:'something is up w my server',
+        });
+      }else{
+        data = JSON.parse(data);
+        res.status(200).json(data);
+      }
+    })
+  })
+
+  app.get('/todos/:id',(req,res)=>{
+    const id = req.params.id;
+    fs.readFile('todos.json','utf-8',(err,data)=>{
+      if(err){
+        res.status(403).json({
+          msg:'something is up w my server',
+        });
+      }else{
+        data = JSON.parse(data);
+        try{
+          res.status(200).json(data[id]);
+        }catch{
+          res.status(404).json({
+            msg:'file not found'
+          })
+        }
+      }
+    })
+  })
+
+
+  app.post('/todos',(req,res) => {
+      const obj = {
+        title:req.body.title,
+        completed:req.body.completed,
+        description:req.body.description,
+      }
+      fs.readFile('/todos.json','utf-8',(err,data)=>{
+        if(err){
+          res.json({
+            msg: 'something is up w my server'
+          })
+        }else{
+          data = JSON.parse(data);
+          const resID = data.length;
+          data.push(obj);
+          const writeToFile = JSON.stringify(data);
+          fs.writeFile('/todos.json',data,(err)=>{
+            if(err){
+              res.json({
+                msg:'somethings up bro'
+              })
+            }else{
+              res.status(201).json({
+                resID
+              })
+            }
+          })
+        }
+      })
+  })
+
+
+  app.put('/todos/:id',(req,res)=>{
+    const id = req.params.id;
+    fs.readFile('todos.json','utf-8',(err,data)=>{
+      if(err){
+        res.status(403).json({
+          msg:'something is up w my server',
+        });
+      }else{
+        data = JSON.parse(data);
+        try{
+          data[id].completed = "true";
+          res.status(200)
+        }catch(err){
+          res.status(404)
+        }
+      }
+    })
+  })
+
+
   module.exports = app;
